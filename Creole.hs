@@ -43,6 +43,11 @@ block =
     newline
     newline
     return $ "<p>" ++ paragraph ++ "</p>")
+  <|> try (do
+    string "{{{"
+    nowiki <- many (try (string "}" >> noneOf "}") <|> try (string "}}" >> noneOf "}") <|> noneOf "}")
+    string "}}}"
+    return $ "<pre>" ++ nowiki ++ "</pre>")
   
 -- parse Creole 1.0 source and return HTML
 -- requires a trailing newline
@@ -55,3 +60,4 @@ creole =
   <|> return ""
 
 out1 = parseTest creole "== title \nfoo bar http://example.com\n\n"
+out2 = parseTest creole "{{{ foo }}}"
