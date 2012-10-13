@@ -54,13 +54,4 @@ creole =
           return $ block' ++ "\n" ++ rest)
   <|> return ""
 
--- defined in Parsec as parseTest
-run :: Show a => Parser a -> String -> IO ()
-run p input
-        = case (parse p "" input) of
-            Left err -> do
-              putStr "parse error at "
-              print err
-            Right x -> print x
-            
-out1 = run creole "== title \nfoo bar http://example.com\n\n"
+out1 = parseTest creole "== title \nfoo bar http://example.com\n\n"
