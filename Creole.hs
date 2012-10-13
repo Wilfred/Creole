@@ -2,13 +2,6 @@
 
 import Text.ParserCombinators.Parsec
 
-simple :: Parser Char
-simple  = letter
-
--- todo: whitespace on blank line
-emptyLine :: Parser String
-emptyLine = many1 newline
-
 -- text, links, bold/italic (things inside paragraphs)
 lineContent :: Parser String
 lineContent =
@@ -26,33 +19,40 @@ lineContent =
               whitespace <- many1 $ oneOf " \t"
               rest <- lineContent
               return $ whitespace ++ rest)
-  -- <|> do
-  --       emptyLine
-  --       return ""
   <|> return ""
 
 -- either a paragraph or a heading
 -- TODO: headings may end with matching == too
+-- everything ends with a newline, except paragraphs, which require two
 block :: Parser String
 block = 
   try (do
     string "=="
     spaces
     heading <- many $ noneOf "\n"
+    newline
     return $ "<h2>" ++ heading ++ "</h2>")
   <|> try (do
     char '='
     spaces
     heading <- many $ noneOf "\n"
+    newline
     return $ "<h1>" ++ heading ++ "</h1>")
   <|> try (do
     paragraph <- lineContent
+    newline
+    newline
     return $ "<p>" ++ paragraph ++ "</p>")
-
-paragraphs :: Parser [String]
-paragraphs = do
-  paras <- (many $ noneOf "\n") `sepBy` emptyLine
-  return $ map (\s -> "<p>" ++ s ++ "</p>\n") paras
+  
+-- parse Creole 1.0 source and return HTML
+-- requires a trailing newline
+creole :: Parser String
+creole =
+  try (do
+          block' <- block
+          rest <- creole
+          return $ block' ++ "\n" ++ rest)
+  <|> return ""
 
 -- defined in Parsec as parseTest
 run :: Show a => Parser a -> String -> IO ()
@@ -63,6 +63,4 @@ run p input
               print err
             Right x -> print x
             
-out1 = run simple "z"
-
-
+out1 = run creole "== title \nfoo bar http://example.com\n\n"
