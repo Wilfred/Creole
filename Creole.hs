@@ -2,15 +2,17 @@
 
 import Text.ParserCombinators.Parsec
 
+nakedLink = do
+  string "http://"
+  target <- many $ noneOf " \n"
+  rest <- lineContent
+  return $ "<a href=\"http://" ++ target ++ "\">" ++ target ++ "</a>" ++ rest
+
 -- text, links, bold/italic (things inside paragraphs)
 lineContent :: Parser String
 lineContent =
   -- TODO: Single punctuation characters (,.?!:;"') at the end of URLs should not be considered part of the URL.
-      try (do
-              string "http://"
-              target <- many $ noneOf " \n"
-              rest <- lineContent
-              return $ "<a href=\"http://" ++ target ++ "\">" ++ target ++ "</a>" ++ rest)
+      try nakedLink
   <|> try (do
               word <- many1 (noneOf " \n")
               rest <- lineContent
