@@ -2,6 +2,8 @@
 
 import Text.ParserCombinators.Parsec
 
+restOfLine = many $ noneOf "\n"
+
 nakedLink = do
   string "http://"
   target <- many $ noneOf " \n"
@@ -42,13 +44,13 @@ lineContent =
 heading1 = do
   string "="
   spaces
-  heading <- many $ noneOf "\n"
+  heading <- restOfLine
   newline
   return $ "<h1>" ++ heading ++ "</h1>"
 heading2 = do
   string "=="
   spaces
-  heading <- many $ noneOf "\n"
+  heading <- restOfLine
   newline
   return $ "<h2>" ++ heading ++ "</h2>"
   
@@ -69,7 +71,7 @@ unorderedListItems :: Parser [String]
 unorderedListItems =
   try (do
           string "*"
-          item <- many $ noneOf "\n"
+          item <- restOfLine
           newline
           rest <- unorderedListItems
           return $ item : rest)
