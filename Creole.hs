@@ -64,6 +64,23 @@ nowiki = do
   string "}}}"
   return $ "<pre>" ++ nowiki ++ "</pre>"
   
+-- todo: leading whitespace
+unorderedListItems :: Parser [String]
+unorderedListItems =
+  try (do
+          string "*"
+          item <- many $ noneOf "\n"
+          newline
+          rest <- unorderedListItems
+          return $ item : rest)
+  <|> return []
+
+unorderedList = do
+  items <- unorderedListItems
+  newline
+  let liTags = map (\s -> "<li>" ++ s ++ "</li>\n") items
+  let liTagsJoined = foldr (++) "" liTags
+  return $ "<ul>\n" ++ liTagsJoined ++ "</ul>\n"
 
 -- either a paragraph or a heading
 -- TODO: headings may end with matching == too
@@ -73,6 +90,7 @@ block =
   -- need to match subsubheadings first
       try heading2
   <|> try heading1
+  <|> try unorderedList
   <|> try paragraph
   <|> try nowiki
   
@@ -89,3 +107,4 @@ creole =
 out1 = parseTest creole "== title \nfoo bar http://example.com\n\n"
 out2 = parseTest creole "{{{ foo }}}"
 out3 = parseTest creole "some **bold** text and //italics// too!\n\n"
+out4 = parseTest creole "*foo\n*bar\n\n"
