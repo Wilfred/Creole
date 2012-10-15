@@ -8,19 +8,27 @@ nakedLink = do
   rest <- lineContent
   return $ "<a href=\"http://" ++ target ++ "\">" ++ target ++ "</a>" ++ rest
   
-boldText = do
+textInBold = do
   string "**"
   boldText <- many $ noneOf "*"
   string "**"
   rest <- lineContent
   return $ "<strong>" ++ boldText ++ "</strong>" ++ rest
 
+textInItalics = do
+  string "//"
+  italicsText <- many $ noneOf "/"
+  string "//"
+  rest <- lineContent
+  return $ "<em>" ++ italicsText ++ "</em>" ++ rest
+
 -- text, links, bold/italic (things inside paragraphs)
 lineContent :: Parser String
 lineContent =
   -- TODO: Single punctuation characters (,.?!:;"') at the end of URLs should not be considered part of the URL.
       try nakedLink
-  <|> try boldText
+  <|> try textInBold
+  <|> try textInItalics
   <|> try (do
               word <- many1 (noneOf " \n")
               rest <- lineContent
@@ -44,10 +52,10 @@ heading2 = do
   newline
   return $ "<h2>" ++ heading ++ "</h2>"
   
+paragraph :: Parser String
 paragraph = do
   paragraph <- lineContent
-  newline
-  newline
+  string "\n\n"
   return $ "<p>" ++ paragraph ++ "</p>"
   
 nowiki = do
@@ -80,4 +88,4 @@ creole =
 
 out1 = parseTest creole "== title \nfoo bar http://example.com\n\n"
 out2 = parseTest creole "{{{ foo }}}"
-out3 = parseTest creole "some **bold** text\n\n"
+out3 = parseTest creole "some **bold** text and //italics// too!\n\n"
