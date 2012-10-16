@@ -66,16 +66,25 @@ nowiki = do
   string "}}}"
   return $ "<pre>" ++ nowiki ++ "</pre>"
   
--- todo: leading whitespace
-unorderedListItems :: Parser [String]
-unorderedListItems =
+  
+unorderedListItem :: Parser (Maybe String)
+unorderedListItem =
   try (do
           string "*"
           item <- restOfLine
-          newline
-          rest <- unorderedListItems
-          return $ item : rest)
-  <|> return []
+          return $ Just item
+      )
+  <|> return Nothing
+
+-- todo: leading whitespace
+unorderedListItems :: Parser [String]
+unorderedListItems = do
+  item <- unorderedListItem
+  case item of
+    Just line -> do
+      rest <- unorderedListItems
+      return $ line : rest
+    Nothing -> return []
 
 unorderedList = do
   items <- unorderedListItems
@@ -105,7 +114,7 @@ creole =
           rest <- creole
           return $ block' ++ "\n" ++ rest)
   <|> return ""
-
+  
 out1 = parseTest creole "== title \nfoo bar http://example.com\n\n"
 out2 = parseTest creole "{{{ foo }}}"
 out3 = parseTest creole "some **bold** text and //italics// too!\n\n"
