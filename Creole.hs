@@ -53,6 +53,18 @@ heading2 = do
   heading <- restOfLine
   newline
   return $ "<h2>" ++ heading ++ "</h2>"
+heading3 = do
+  string "==="
+  spaces
+  heading <- restOfLine
+  newline
+  return $ "<h3>" ++ heading ++ "</h3>"
+heading4 = do
+  string "===="
+  spaces
+  heading <- restOfLine
+  newline
+  return $ "<h4>" ++ heading ++ "</h4>"
   
 paragraph :: Parser String
 paragraph = do
@@ -99,7 +111,9 @@ unorderedList = do
 block :: Parser String
 block = 
   -- need to match subsubheadings first
-      try heading2
+      try heading4
+  <|> try heading3
+  <|> try heading2
   <|> try heading1
   <|> try unorderedList
   <|> try paragraph
