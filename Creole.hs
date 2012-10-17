@@ -40,29 +40,43 @@ lineContent =
               rest <- lineContent
               return $ whitespace ++ rest)
   <|> return ""
+  
+noTrailingEquals :: Parser String
+noTrailingEquals = 
+  try (do
+          text <- many1 $ noneOf "=\n"
+          rest <- noTrailingEquals
+          return $ text ++ rest)
+  <|> try (do
+          equals <- many1 $ oneOf "="
+          afterEquals <- noTrailingEquals
+          case afterEquals of
+            [] -> return ""
+            _ -> return $ equals ++ afterEquals)
+  <|> return ""
       
 heading1 = do
   string "="
   spaces
-  heading <- restOfLine
+  heading <- noTrailingEquals
   newline
   return $ "<h1>" ++ heading ++ "</h1>"
 heading2 = do
   string "=="
   spaces
-  heading <- restOfLine
+  heading <- noTrailingEquals
   newline
   return $ "<h2>" ++ heading ++ "</h2>"
 heading3 = do
   string "==="
   spaces
-  heading <- restOfLine
+  heading <- noTrailingEquals
   newline
   return $ "<h3>" ++ heading ++ "</h3>"
 heading4 = do
   string "===="
   spaces
-  heading <- restOfLine
+  heading <- noTrailingEquals
   newline
   return $ "<h4>" ++ heading ++ "</h4>"
   
@@ -129,7 +143,7 @@ creole =
           return $ block' ++ "\n" ++ rest)
   <|> return ""
   
-out1 = parseTest creole "== title \nfoo bar http://example.com\n\n"
+out1 = parseTest creole "== title ==\nfoo bar http://example.com\n\n"
 out2 = parseTest creole "{{{ foo }}}"
 out3 = parseTest creole "some **bold** text and //italics// too!\n\n"
 out4 = parseTest creole "*foo\n*bar\n\n"
