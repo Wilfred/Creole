@@ -1,6 +1,9 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
+module Creole where
+
 import Text.ParserCombinators.Parsec
+
 
 restOfLine = many $ noneOf "\n"
 
