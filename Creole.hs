@@ -23,6 +23,14 @@ textInItalics = do
   string "//"
   rest <- lineContent
   return $ "<em>" ++ italicsText ++ "</em>" ++ rest
+  
+-- todo: single ] in links
+link :: Parser String
+link = do
+  string "[["
+  target <- many $ noneOf "]"
+  string "]]"
+  return $ "<a href=\"/" ++ target ++ "\">" ++ target ++ "</a>"
 
 -- text, links, bold/italic (things inside paragraphs)
 lineContent :: Parser String
@@ -31,14 +39,11 @@ lineContent =
       try nakedLink
   <|> try textInBold
   <|> try textInItalics
+  <|> try link
   <|> try (do
-              word <- many1 (noneOf " \n")
+              char <- noneOf "\n"
               rest <- lineContent
-              return $ word ++ rest)
-  <|> try (do
-              whitespace <- many1 $ oneOf " \t"
-              rest <- lineContent
-              return $ whitespace ++ rest)
+              return $ char : rest)
   <|> return ""
   
 noTrailingEquals :: Parser String
@@ -143,7 +148,7 @@ creole =
           return $ block' ++ "\n" ++ rest)
   <|> return ""
   
-out1 = parseTest creole "== title ==\nfoo bar http://example.com\n\n"
+out1 = parseTest creole "== title ==\nfoo bar http://example.com [[foo]]\n\n"
 out2 = parseTest creole "{{{ foo }}}"
 out3 = parseTest creole "some **bold** text and //italics// too!\n\n"
 out4 = parseTest creole "*foo\n*bar\n\n"
