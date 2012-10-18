@@ -32,6 +32,12 @@ link = do
   string "]]"
   rest <- lineContent
   return $ "<a href=\"/" ++ target ++ "\">" ++ target ++ "</a>" ++ rest
+  
+lineBreak :: Parser String
+lineBreak = do
+  string "\\\\"
+  rest <- lineContent
+  return $ "<br>" ++ rest
 
 -- text, links, bold/italic (things inside paragraphs)
 lineContent :: Parser String
@@ -41,6 +47,7 @@ lineContent =
   <|> try textInBold
   <|> try textInItalics
   <|> try link
+  <|> try lineBreak
   <|> try (do
               char <- noneOf "\n"
               rest <- lineContent
@@ -151,6 +158,6 @@ creole =
   
 out1 = parseTest creole "== title ==\nfoo bar http://example.com [[foo]] stuff\n\n"
 out2 = parseTest creole "{{{ foo }}}"
-out3 = parseTest creole "some **bold** text and //italics// too!\n\n"
+out3 = parseTest creole "some **bold** text and //italics// too!\\\\newline\n\n"
 out4 = parseTest creole "*foo\n*bar\n\n"
 out5 = parseTest creole "*foo\n*bar **baz**\n\n"
