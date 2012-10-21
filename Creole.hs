@@ -28,13 +28,24 @@ textInItalics = do
   return $ "<em>" ++ italicsText ++ "</em>" ++ rest
   
 -- todo: single ] in links
-link :: Parser String
-link = do
+unnamedLink :: Parser String
+unnamedLink = do
   string "[["
   target <- many $ noneOf "]"
   string "]]"
   rest <- lineContent
-  return $ "<a href=\"/" ++ target ++ "\">" ++ target ++ "</a>" ++ rest
+  return $ "<a href=\"" ++ target ++ "\">" ++ target ++ "</a>" ++ rest
+  
+namedLink :: Parser String
+namedLink = do
+  string "[["
+  target <- many $ noneOf "]|"
+  string "|"
+  name <- many $ noneOf "]"
+  string "]]"
+  rest <- lineContent
+  return $ "<a href=\"" ++ target ++ "\">" ++ name ++ "</a>" ++ rest
+  
   
 lineBreak :: Parser String
 lineBreak = do
@@ -49,7 +60,8 @@ lineContent =
       try nakedLink
   <|> try textInBold
   <|> try textInItalics
-  <|> try link
+  <|> try namedLink
+  <|> try unnamedLink
   <|> try lineBreak
   <|> try (do
               char <- noneOf "\n"

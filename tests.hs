@@ -14,6 +14,12 @@ testTitle =
             (parserOutput creole "== title ==\n")
             "<h2>title </h2>\n")
 
-tests = TestList [testTitle]
+testNamedLink = 
+  TestCase (assertEqual 
+            "Renders a named link"
+            (parserOutput creole "[[foo|bar]]\n\n")
+            "<p><a href=\"foo\">bar</a></p>\n")
+
+tests = TestList [testTitle, testNamedLink]
 
 main = runTestTT tests
