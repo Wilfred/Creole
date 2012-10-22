@@ -121,31 +121,41 @@ nowiki = do
   return $ "<pre>" ++ nowiki ++ "</pre>"
   
   
-unorderedListItem :: Parser (Maybe String)
+-- todo: space after asterisk is optional
+unorderedListItem :: Parser (Maybe (Int, String))
 unorderedListItem =
   try (do
-          string "*"
+          indentLevel <- many1 $ oneOf "*"
           item <- lineContent
-          return $ Just item
+          return $ Just (length indentLevel, item)
       )
   <|> return Nothing
 
 -- todo: leading whitespace
-unorderedListItems :: Parser [String]
+unorderedListItems :: Parser [(Int, String)]
 unorderedListItems = do
   item <- unorderedListItem
   case item of
-    Just line -> do
+    Just (indentLevel, line) -> do
       rest <- unorderedListItems
-      return $ line : rest
+      return $ (indentLevel, line) : rest
     Nothing -> return []
+    
+listToHtml :: [(Int, String)] -> String
+listToHtml items =
+  listToHtml' 0 items
+  where
+    listToHtml' currentIndent listItems@((indent, line):items)
+      | currentIndent < indent = "<ul>\n<li>" ++ (listToHtml' (currentIndent + 1) listItems)
+      | currentIndent == indent = line ++ "</li>\n<li>" ++ (listToHtml' currentIndent items)
+      | currentIndent > indent = "</li>\n</ul>\n" ++ (listToHtml' (currentIndent - 1) listItems)
+    listToHtml' currentIndent _ = ""
 
+unorderedList :: Parser String
 unorderedList = do
   items <- unorderedListItems
   newline
-  let liTags = map (\s -> "<li>" ++ s ++ "</li>\n") items
-  let liTagsJoined = foldr (++) "" liTags
-  return $ "<ul>\n" ++ liTagsJoined ++ "</ul>\n"
+  return (listToHtml items)
 
 -- either a paragraph or a heading
 -- TODO: headings may end with matching == too

@@ -19,7 +19,13 @@ testNamedLink =
             "Renders a named link"
             (parserOutput creole "[[foo|bar]]\n\n")
             "<p><a href=\"foo\">bar</a></p>\n")
+  
+testBullets = 
+  TestCase (assertEqual
+           "Renders two levels of unordered list"
+           (parserOutput creole "* foo\n** bar\n")
+           "<ul>\n<li> foo</li><li><ul><li> bar</li></ul></li></ul>\n")
 
-tests = TestList [testTitle, testNamedLink]
+tests = TestList [testTitle, testNamedLink, testBullets]
 
 main = runTestTT tests
