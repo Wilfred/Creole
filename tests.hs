@@ -28,13 +28,13 @@ testFlatBullets =
   assertRendersTo
   "Renders flat unordered list"
   "* foo\n* bar\n\n"
-  "<ul>\n<li>foo</li>\n<li>bar</li>\n</ul>\n\n"
+  "<ul><li>foo</li><li>bar</li></ul>\n"
   
-testBullets = 
+testNestedBullets = 
   assertRendersTo
-  "Renders two levels of unordered list"
-  "* foo\n** bar\n"
-  "<ul>\n<li> foo</li><li><ul><li> bar</li></ul></li></ul>\n"
+  "Renders a nested unordered list"
+  "* foo\n** bar\n\n"
+  "<ul><li>foo</li><li><ul><li>bar</li></ul></li></ul>\n"
   
 testBoldText =
   assertRendersTo "Renders bold text"
@@ -42,6 +42,6 @@ testBoldText =
   "<p>some <strong>bold</strong> text</p>\n"
 
 tests = TestList [testTitle, testNamedLink, testFlatBullets, 
-                  testBullets, testBoldText]
+                  testNestedBullets, testBoldText]
 
 main = runTestTT tests
