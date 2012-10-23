@@ -29,7 +29,12 @@ testBullets =
   "Renders two levels of unordered list"
   "* foo\n** bar\n"
   "<ul>\n<li> foo</li><li><ul><li> bar</li></ul></li></ul>\n"
+  
+testBoldText =
+  assertRendersTo "Renders bold text"
+  "some **bold** text\n\n"
+  "<p>some <strong>bold</strong> text</p>\n"
 
-tests = TestList [testTitle, testNamedLink, testBullets]
+tests = TestList [testTitle, testNamedLink, testBullets, testBoldText]
 
 main = runTestTT tests
