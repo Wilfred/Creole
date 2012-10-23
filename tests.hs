@@ -17,6 +17,13 @@ testTitle =
   assertRendersTo "Renders a title"
   "== title ==\n"
   "<h2>title </h2>\n"
+  
+testNakedLink =
+  assertRendersTo
+  "Renders a naked link"
+  "http://example.com\n\n"
+  "<p><a href=\"http://example.com\">http://example.com</a></p>\n"
+  
 
 testNamedLink = 
   assertRendersTo
@@ -46,7 +53,7 @@ testItalicText =
   "some //italic// text\n\n"
   "<p>some <em>italic</em> text</p>\n"
 
-tests = TestList [testTitle, testNamedLink, testFlatBullets, 
+tests = TestList [testTitle, testNamedLink, testNakedLink, testFlatBullets, 
                   testNestedBullets, testBoldText, testItalicText]
 
 main = runTestTT tests

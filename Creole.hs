@@ -183,7 +183,6 @@ creole =
           return $ block' ++ "\n" ++ rest)
   <|> return ""
   
-out1 = parseTest creole "== title ==\nfoo bar http://example.com [[foo]] stuff\n\n"
 out2 = parseTest creole "{{{ foo }}}"
 out3 = parseTest creole "some **bold** text and //italics// too!\\\\newline\n\n"
 out4 = parseTest creole "*foo\n*bar\n\n"
