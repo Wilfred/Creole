@@ -126,7 +126,9 @@ unorderedListItem :: Parser (Maybe (Int, String))
 unorderedListItem =
   try (do
           indentLevel <- many1 $ oneOf "*"
+          spaces
           item <- lineContent
+          newline
           return $ Just (length indentLevel, item)
       )
   <|> return Nothing
@@ -146,9 +148,9 @@ listToHtml items =
   listToHtml' 0 items
   where
     listToHtml' currentIndent listItems@((indent, line):items)
-      | currentIndent < indent = "<ul>\n<li>" ++ (listToHtml' (currentIndent + 1) listItems)
-      | currentIndent == indent = line ++ "</li>\n<li>" ++ (listToHtml' currentIndent items)
-      | currentIndent > indent = "</li>\n</ul>\n" ++ (listToHtml' (currentIndent - 1) listItems)
+      | currentIndent < indent = "<ul>\n" ++ (listToHtml' (currentIndent + 1) listItems) ++ "</ul>\n"
+      | currentIndent == indent = "<li>" ++ line ++ "</li>\n" ++ (listToHtml' currentIndent items)
+      | currentIndent > indent = listToHtml' (currentIndent - 1) listItems
     listToHtml' currentIndent _ = ""
 
 unorderedList :: Parser String

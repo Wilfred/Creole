@@ -24,6 +24,12 @@ testNamedLink =
   "[[foo|bar]]\n\n"
   "<p><a href=\"foo\">bar</a></p>\n"
   
+testFlatBullets =
+  assertRendersTo
+  "Renders flat unordered list"
+  "* foo\n* bar\n\n"
+  "<ul>\n<li>foo</li>\n<li>bar</li>\n</ul>\n\n"
+  
 testBullets = 
   assertRendersTo
   "Renders two levels of unordered list"
@@ -35,6 +41,7 @@ testBoldText =
   "some **bold** text\n\n"
   "<p>some <strong>bold</strong> text</p>\n"
 
-tests = TestList [testTitle, testNamedLink, testBullets, testBoldText]
+tests = TestList [testTitle, testNamedLink, testFlatBullets, 
+                  testBullets, testBoldText]
 
 main = runTestTT tests
