@@ -145,14 +145,13 @@ unorderedListItems = do
     
 listToHtml :: [(Int, String)] -> String
 listToHtml items =
-  removeOuterLi $ listToHtml' 0 items
+  "<ul>" ++ (listToHtml' 1 items) ++ "</ul>"
   where
     listToHtml' currentIndent listItems@((indent, line):items)
       | currentIndent < indent = "<li><ul>" ++ (listToHtml' (currentIndent + 1) listItems) ++ "</ul></li>"
       | currentIndent == indent = "<li>" ++ line ++ "</li>" ++ (listToHtml' currentIndent items)
       | currentIndent > indent = listToHtml' (currentIndent - 1) listItems
     listToHtml' currentIndent _ = ""
-    removeOuterLi html = drop 4 $ take (length html - 5) html
 
 unorderedList :: Parser String
 unorderedList = do
