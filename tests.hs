@@ -41,7 +41,12 @@ testBoldText =
   "some **bold** text\n\n"
   "<p>some <strong>bold</strong> text</p>\n"
 
+testItalicText =
+  assertRendersTo "Renders italic text"
+  "some //italic// text\n\n"
+  "<p>some <em>italic</em> text</p>\n"
+
 tests = TestList [testTitle, testNamedLink, testFlatBullets, 
-                  testNestedBullets, testBoldText]
+                  testNestedBullets, testBoldText, testItalicText]
 
 main = runTestTT tests
