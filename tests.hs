@@ -7,24 +7,28 @@ parserOutput parser text =
   case parse parser "" text of
     Left _ -> ""
     Right x -> x
+    
+assertRendersTo :: String -> String -> String -> Test
+assertRendersTo message source output =
+  TestCase (assertEqual message output (parserOutput creole source))
 
+-- todo: factor out assertion
 testTitle = 
-  TestCase (assertEqual 
-            "Renders a title"
-            (parserOutput creole "== title ==\n")
-            "<h2>title </h2>\n")
+  assertRendersTo "Renders a title"
+  "== title ==\n"
+  "<h2>title </h2>\n"
 
 testNamedLink = 
-  TestCase (assertEqual 
-            "Renders a named link"
-            (parserOutput creole "[[foo|bar]]\n\n")
-            "<p><a href=\"foo\">bar</a></p>\n")
+  assertRendersTo
+  "Renders a named link"
+  "[[foo|bar]]\n\n"
+  "<p><a href=\"foo\">bar</a></p>\n"
   
 testBullets = 
-  TestCase (assertEqual
-           "Renders two levels of unordered list"
-           (parserOutput creole "* foo\n** bar\n")
-           "<ul>\n<li> foo</li><li><ul><li> bar</li></ul></li></ul>\n")
+  assertRendersTo
+  "Renders two levels of unordered list"
+  "* foo\n** bar\n"
+  "<ul>\n<li> foo</li><li><ul><li> bar</li></ul></li></ul>\n"
 
 tests = TestList [testTitle, testNamedLink, testBullets]
 
