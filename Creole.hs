@@ -143,15 +143,18 @@ unorderedListItems = do
       return $ (indentLevel, line) : rest
     Nothing -> return []
     
+-- todo: badly nested lists
 listToHtml :: [(Int, String)] -> String
 listToHtml items =
-  "<ul>" ++ (listToHtml' 1 items) ++ "</ul>"
+  listToHtml' 0 items
   where
     listToHtml' currentIndent listItems@((indent, line):items)
-      | currentIndent < indent = "<li><ul>" ++ (listToHtml' (currentIndent + 1) listItems) ++ "</ul></li>"
-      | currentIndent == indent = "<li>" ++ line ++ "</li>" ++ (listToHtml' currentIndent items)
-      | currentIndent > indent = listToHtml' (currentIndent - 1) listItems
-    listToHtml' currentIndent _ = ""
+      | currentIndent < indent = "<ul><li>" ++ line ++ (listToHtml' (currentIndent + 1) items)
+      | currentIndent == indent = "</li><li>" ++ line ++ (listToHtml' currentIndent items)
+      | currentIndent > indent = "</li></ul>" ++ listToHtml' (currentIndent - 1) items
+    listToHtml' currentIndent [] = 
+      if currentIndent == 0 then ""
+      else "</li></ul>" ++ listToHtml' (currentIndent - 1) []
 
 unorderedList :: Parser String
 unorderedList = do

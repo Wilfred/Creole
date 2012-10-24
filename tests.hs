@@ -41,7 +41,7 @@ testNestedBullets =
   assertRendersTo
   "Renders a nested unordered list"
   "* foo\n** bar\n\n"
-  "<ul><li>foo</li><li><ul><li>bar</li></ul></li></ul>\n"
+  "<ul><li>foo<ul><li>bar</li></ul></li></ul>\n"
   
 testBoldText =
   assertRendersTo "Renders bold text"
