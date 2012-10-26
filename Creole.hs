@@ -8,10 +8,11 @@ import Text.ParserCombinators.Parsec
 restOfLine = many $ noneOf "\n"
 
 nakedLink = do
-  string "http://"
+  protocol <- string "http://"
   target <- many $ noneOf " \n"
+  let link = protocol ++ target
   rest <- lineContent
-  return $ "<a href=\"http://" ++ target ++ "\">" ++ target ++ "</a>" ++ rest
+  return $ "<a href=\"" ++ link ++ "\">" ++ link ++ "</a>" ++ rest
   
 textInBold = do
   string "**"
