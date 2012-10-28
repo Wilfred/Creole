@@ -192,5 +192,3 @@ creole =
   
 out2 = parseTest creole "{{{ foo }}}"
 out3 = parseTest creole "some **bold** text and //italics// too!\\\\newline\n\n"
-out4 = parseTest creole "*foo\n*bar\n\n"
-out5 = parseTest creole "*foo\n*bar **baz**\n\n"
