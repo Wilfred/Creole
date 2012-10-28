@@ -57,8 +57,13 @@ testItalicText =
   assertRendersTo "Renders italic text"
   "some //italic// text\n\n"
   "<p>some <em>italic</em> text</p>\n"
+  
+testLinebreak =
+  assertRendersTo "Renders an HTML line break"
+  "foo\\\\bar"
+  "<p>foo<br>bar</p>\n"
 
 tests = TestList [testParagraph, testTitle, testNamedLink, testNakedLink, testFlatBullets, 
-                  testNestedBullets, testBoldText, testItalicText]
+                  testNestedBullets, testBoldText, testItalicText, testLinebreak]
 
 main = runTestTT tests

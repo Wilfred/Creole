@@ -191,4 +191,3 @@ creole =
   <|> return ""
   
 out2 = parseTest creole "{{{ foo }}}"
-out3 = parseTest creole "some **bold** text and //italics// too!\\\\newline\n\n"
