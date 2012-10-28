@@ -189,5 +189,3 @@ creole =
           rest <- creole
           return $ block' ++ "\n" ++ rest)
   <|> return ""
-  
-out2 = parseTest creole "{{{ foo }}}"
