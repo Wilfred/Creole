@@ -62,8 +62,14 @@ testLinebreak =
   assertRendersTo "Renders an HTML line break"
   "foo\\\\bar"
   "<p>foo<br>bar</p>\n"
+  
+testNoWiki =
+  assertRendersTo "Renders preformatted text"
+  "{{{foo http://bar}}}"
+  "<pre>foo http://bar</pre>\n"
 
 tests = TestList [testParagraph, testTitle, testNamedLink, testNakedLink, testFlatBullets, 
-                  testNestedBullets, testBoldText, testItalicText, testLinebreak]
+                  testNestedBullets, testBoldText, testItalicText, testLinebreak,
+                  testNoWiki]
 
 main = runTestTT tests

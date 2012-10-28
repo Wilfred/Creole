@@ -174,8 +174,8 @@ block =
   <|> try heading2
   <|> try heading1
   <|> try unorderedList
-  <|> paragraph
   <|> try nowiki
+  <|> paragraph
   
 -- parse Creole 1.0 source and return HTML
 -- requires a trailing newline
