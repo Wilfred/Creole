@@ -112,7 +112,7 @@ heading4 = do
 paragraph :: Parser String
 paragraph = do
   paragraph <- lineContent
-  string "\n\n"
+  string "\n\n" <|> string ""
   return $ "<p>" ++ paragraph ++ "</p>"
   
 nowiki = do
@@ -174,7 +174,7 @@ block =
   <|> try heading2
   <|> try heading1
   <|> try unorderedList
-  <|> try paragraph
+  <|> paragraph
   <|> try nowiki
   
 -- parse Creole 1.0 source and return HTML
@@ -182,6 +182,9 @@ block =
 creole :: Parser String
 creole =
   try (do
+          eof
+          return "")
+  <|> try (do
           block' <- block
           rest <- creole
           return $ block' ++ "\n" ++ rest)
