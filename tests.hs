@@ -68,8 +68,13 @@ testNoWiki =
   "{{{foo http://bar}}}"
   "<pre>foo http://bar</pre>\n"
 
+testHorizontalRule =
+  assertRendersTo "Renders a horizontal rule"
+  "----"
+  "<hr>\n"
+
 tests = TestList [testParagraph, testTitle, testNamedLink, testNakedLink, testFlatBullets, 
                   testNestedBullets, testBoldText, testItalicText, testLinebreak,
-                  testNoWiki]
+                  testNoWiki, testHorizontalRule]
 
 main = runTestTT tests

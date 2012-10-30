@@ -162,6 +162,12 @@ unorderedList = do
   items <- unorderedListItems
   newline
   return (listToHtml items)
+  
+horizontalRule :: Parser String
+horizontalRule = do
+  string "----"
+  (newline >> string "") <|> string ""
+  return "<hr>"
 
 -- either a paragraph or a heading
 -- TODO: headings may end with matching == too
@@ -175,6 +181,7 @@ block =
   <|> try heading1
   <|> try unorderedList
   <|> try nowiki
+  <|> horizontalRule
   <|> paragraph
   
 -- parse Creole 1.0 source and return HTML
