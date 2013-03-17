@@ -1,14 +1,15 @@
 import Test.HUnit
 import Text.ParserCombinators.Parsec
 import Creole
+import Types
 
-parserOutput :: Parser String -> String -> String
+parserOutput :: Parser CreoleSource -> CreoleSource -> Html
 parserOutput parser text =
   case parse parser "" text of
     Left _ -> ""
     Right x -> x
     
-assertRendersTo :: String -> String -> String -> Test
+assertRendersTo :: String -> CreoleSource -> Html -> Test
 assertRendersTo message source output =
   TestCase (assertEqual message output (parserOutput creole source))
 

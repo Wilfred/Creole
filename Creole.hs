@@ -3,6 +3,7 @@
 module Creole where
 
 import Text.ParserCombinators.Parsec
+import Types
 
 
 restOfLine = many $ noneOf "\n"
@@ -29,7 +30,7 @@ textInItalics = do
   return $ "<em>" ++ italicsText ++ "</em>" ++ rest
   
 -- todo: single ] in links
-unnamedLink :: Parser String
+unnamedLink :: Parser CreoleSource
 unnamedLink = do
   string "[["
   target <- many $ noneOf "]"
@@ -37,7 +38,7 @@ unnamedLink = do
   rest <- lineContent
   return $ "<a href=\"" ++ target ++ "\">" ++ target ++ "</a>" ++ rest
   
-namedLink :: Parser String
+namedLink :: Parser CreoleSource
 namedLink = do
   string "[["
   target <- many $ noneOf "]|"
@@ -48,14 +49,14 @@ namedLink = do
   return $ "<a href=\"" ++ target ++ "\">" ++ name ++ "</a>" ++ rest
   
   
-lineBreak :: Parser String
+lineBreak :: Parser CreoleSource
 lineBreak = do
   string "\\\\"
   rest <- lineContent
   return $ "<br>" ++ rest
 
 -- text, links, bold/italic (things inside paragraphs)
-lineContent :: Parser String
+lineContent :: Parser CreoleSource
 lineContent =
   -- TODO: Single punctuation characters (,.?!:;"') at the end of URLs should not be considered part of the URL.
       try nakedLink
@@ -70,7 +71,7 @@ lineContent =
               return $ char : rest)
   <|> return ""
   
-noTrailingEquals :: Parser String
+noTrailingEquals :: Parser CreoleSource
 noTrailingEquals = 
   try (do
           text <- many1 $ noneOf "=\n"
@@ -109,7 +110,7 @@ heading4 = do
   newline
   return $ "<h4>" ++ heading ++ "</h4>"
   
-paragraph :: Parser String
+paragraph :: Parser CreoleSource
 paragraph = do
   paragraph <- lineContent
   string "\n\n" <|> string ""
@@ -145,7 +146,7 @@ unorderedListItems = do
     Nothing -> return []
     
 -- todo: badly nested lists
-listToHtml :: [(Int, String)] -> String
+listToHtml :: [(Int, String)] -> Html
 listToHtml items =
   listToHtml' 0 items
   where
@@ -157,13 +158,13 @@ listToHtml items =
       if currentIndent == 0 then ""
       else "</li></ul>" ++ listToHtml' (currentIndent - 1) []
 
-unorderedList :: Parser String
+unorderedList :: Parser CreoleSource
 unorderedList = do
   items <- unorderedListItems
   newline
   return (listToHtml items)
   
-horizontalRule :: Parser String
+horizontalRule :: Parser CreoleSource
 horizontalRule = do
   string "----"
   (newline >> string "") <|> string ""
@@ -172,7 +173,7 @@ horizontalRule = do
 -- either a paragraph or a heading
 -- TODO: headings may end with matching == too
 -- everything ends with a newline, except paragraphs, which require two
-block :: Parser String
+block :: Parser CreoleSource
 block = 
   -- need to match subsubheadings first
       try heading4
@@ -186,7 +187,7 @@ block =
   
 -- parse Creole 1.0 source and return HTML
 -- requires a trailing newline
-creole :: Parser String
+creole :: Parser CreoleSource
 creole =
   try (do
           eof
